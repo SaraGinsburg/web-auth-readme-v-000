@@ -24,8 +24,17 @@ class SearchesController < ApplicationController
     end
     render 'search'
 
-    rescue Faraday::TimeoutError
-      @error = "There was a timeout. Please try again."
-      render 'search'
+    # rescue Faraday::TimeoutError
+    #   @error = "There was a timeout. Please try again."
+    # render 'search'
+  end
+
+  def friends
+    resp = Faraday.get("https://foursquare.com/developers/explore#req=users/self/friends ") do |req|
+      req.params['oauth_token'] = session[:token]
+      # don't forget that pesky v param for versioning
+      req.params['v'] = '20160201'
+    end
+    @friends = JSON.parse(resp.body)["response"]["friends"]["items"]
   end
 end
